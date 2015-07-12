@@ -1,4 +1,4 @@
-module HtmlRunner (runDisplay) where
+module ElmTestHtmlRunner (runDisplay) where
 
 import ElmTest.Run as Run
 import ElmTest.Test exposing (..)

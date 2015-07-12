@@ -7,7 +7,7 @@
         "src"
     ],
     "exposed-modules": [
-	"HtmlRunner"
+	"ElmTestHtmlRunner"
     ],
     "dependencies": {
         "deadfoxygrandpa/Elm-Test": "1.0.4 <= v < 2.0.0",

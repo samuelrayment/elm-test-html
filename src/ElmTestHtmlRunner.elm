@@ -1,5 +1,6 @@
 module ElmTestHtmlRunner (runDisplay) where
-
+{- Test runner for Elm-Test using elm-html for output. -}
+    
 import ElmTest.Run as Run
 import ElmTest.Test exposing (..)
 import ElmTest.Runner.String as String
@@ -16,30 +17,49 @@ numericStatusMessage element class' message count =
             ] 
 
 
+indentation : List (String, String)
+indentation = [("padding-left", "10px")]
+
+
+passStyle : List (String, String)
+passStyle = [("color", "green")]
+
+
+failStyle : List (String, String)
+failStyle = [("color", "red")]
+
+
+decideStyle : Bool -> List (String, String)
+decideStyle pass = if pass then passStyle else failStyle
+    
+
 createDivsForResults : Run.Result -> Html
 createDivsForResults results =
     let
         createDiv' result =
             case result of
                 Run.Pass name ->
-                    div [ style [("color", "green")]
-                        , class "test"
+                    div [ style (passStyle ++ indentation)
+                        , class "test pass"
                         ]
                         [ text ("Pass: " ++ name) ]
                 Run.Fail name errorMessage ->
-                    div [ style [("color", "red")]
-                        , class "test"
+                    div [ style (failStyle ++ indentation)
+                        , class "test fail"
                         ]
                         [ text ("Fail: " ++ name)
-                        , span [] [ text errorMessage ]
+                        , div [class "expection"
+                              , style indentation
+                              ] [ text errorMessage ]
                         ]
                 Run.Report name result' ->
-                    div [ class "report" ]
-                        [ text name
-                        , div [ class "tests" ] <| List.map createDiv' result'.results
+                    div [ class "report"
+                        , style (indentation ++ (decideStyle <| List.length result'.failures == 0))
                         ]
+                        (text name :: List.map createDiv' result'.results)
+                        
     in
-        div [] <| [createDiv' results]
+        div [class "results"] <| [createDiv' results]
 
 
 statusMessage : Run.Result -> List Html
@@ -68,5 +88,6 @@ runDisplay tests =
         passed        = failedTests' == 0
         passClass     = if passed then "passed" else "failed"
     in
-    div [ class ("testresults " ++ passClass) ]
-        <| ((statusMessage results) ++ [createDivsForResults results])
+    div [ class ("testresults " ++ passClass)
+        , style indentation
+        ] <| ((statusMessage results) ++ [createDivsForResults results])
